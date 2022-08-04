@@ -2,16 +2,12 @@ import os
 import json
 
 class KittiDataset:
-    def __init__(self, datadir = None) -> None:
-        '''
-            :params datadir : directory for the label file
-        '''
-        self.imageDict = dict()
-        self.criteriaDict = dict()
-        self.KittiDict = dict()
-        
+    def __init__(self, path) -> None:
+        self.path = path
+        self.images = list()
+        self.annotations = list()
+        self.criterias = list()
         self.indexNameDict = {
-            'Criteria': 0,
             'Truncation': 1,
             'Occlusion': 2,
             'Alpha': 3,
@@ -20,54 +16,60 @@ class KittiDataset:
             'Location': (11,14),
             'Rotation': 14
         }
-        
-        if datadir is not None:
-            self.datadir = datadir
-            self.generateDictionary()
-        
-    def generateDictionary(self):
+        self.CriteriaIndexDict = {
+            'Pedestrian' : 0, 
+            'Truck' : 1, 
+            'Car' : 2,  
+            'Cyclist' : 3, 
+            'DontCare' : 4, 
+            'Misc' : 5 , 
+            'Van' : 6, 
+            'Tram' : 7, 
+            'Person_sitting' : 8
+        }
+        self.dataset = dict()
+        self.loadDataset()
+    
+    def loadDataset(self):
         '''
-            creates the necessary dictionaries for the dataset
+            loads the kitti dataset in coco format 
         '''
-        for a in os.listdir(self.datadir):
-            with open(os.path.join(self.datadir, a), 'r') as f:
+        for fileName in os.listdir(self.datadir):
+            with open(os.path.join(self.datadir, fileName), 'r') as f:
                 fileinput = f.read().split('\n')
                 fileinput = [f.split(' ') for f in fileinput if len(f.split(' ')) == 15]
-                self.imageDict[a[0:-4]] = list()
-                for i, f in enumerate(fileinput):
-                    FileDict = dict()
+                # self.imageDict[fileName[0:-4]] = list()
+                imageDict = dict()
+                imageDict['id'] = len(self.images)
+                imageDict['file_name'] = fileName
+                self.images.append(imageDict)
+                for i, annot in enumerate(fileinput):
+                    annotDict = dict()
                     for k, v in self.indexNameDict.items():
                         if type(v) is tuple:
-                            FileDict[k] = f[v[0]: v[1]]
+                            annotDict[k] = annot[v[0]: v[1]]
                         else:
-                            FileDict[k] = f[v]
-                            if k == 'Criteria':
-                                if f[v] not in self.criteriaDict.keys():
-                                    CriDict = dict()
-                                    CriDict['annotations'] = [a[0:-4] + str(i)]
-                                    CriDict['images'] = [a[0:-4]]
-                                    self.criteriaDict[f[v]] = CriDict
-                                else:
-                                    self.criteriaDict[f[v]]['annotations'].append(a[0:-4] + str(i))
-                                    self.criteriaDict[f[v]]['images'].append(a[0:-4])
-                    FileDict['annotation_id'] = a[0:-4] + str(i)
-                    self.imageDict[a[0:-4]].append(FileDict)
+                            annotDict[k] = annot[v]
+                            
+                    annotDict['annotation_id'] = len(self.annotations)
+                    annotDict['image_id'] = len(self.images)
+                    annotDict['criteria_id'] = self.CriteriaIndexDict[annot[0]]
+                    self.annotations.append(annotDict)
         
-        self.KittiDict['images'] = self.imageDict
-        self.KittiDict['criteria'] = self.criteriaDict
-    
-    def generateJson(self, filePath = 'Kitti.json'):
-        '''
-            creates and stores the dataset in json format
-            :params filepath : the path where the json is stored 
-        '''
+        for k, v in self.CriteriaIndexDict.items():
+            criteriaDict = dict()
+            criteriaDict['id'] = v
+            criteriaDict['name'] = k
+            self.criterias.append(criteriaDict)
+            
+        self.dataset['images'] = self.images
+        self.dataset['annotations'] = self.annotations
+        self.dataset['criterias'] = self.criterias
+        
+    def saveDataset(self, filePath = 'KittiInCoco.json'):
         with open(filePath, 'w') as f:
-            json.dump(self.KittiDict, f, indent = 4)
-    
-    def getImageIds(self, crtraNms = []):
-        '''
-            :params crtraNms : List of the criterias names
-            :returns imgIds : list of all imageIds 
-        '''
-        pass
-    
+            json.dump(self.dataset, f)
+            
+        
+        
+        
