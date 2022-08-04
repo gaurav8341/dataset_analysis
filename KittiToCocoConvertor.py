@@ -1,7 +1,7 @@
 import os
 import json
 
-class KittiDataset:
+class KittiToCocoConvertor:
     def __init__(self, path) -> None:
         self.path = path
         self.images = list()

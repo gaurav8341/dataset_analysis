@@ -2,3 +2,4 @@
 /training/*/*
 /__pycache__
 *.json
+/coco_road/
