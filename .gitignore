@@ -1,5 +1,8 @@
-/annotations/*
-/training/*/*
-/__pycache__
+/annotations/
+/training/
+/__pycache__/
 *.json
 /coco_road/
+/yoloDataset/
+/CocoYoloDataset/
+/CocoYoloDataset/*

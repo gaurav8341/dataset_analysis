@@ -61,7 +61,7 @@ class KittiToCocoConvertor:
             
         self.dataset['images'] = self.images
         self.dataset['annotations'] = self.annotations
-        self.dataset['criterias'] = self.criterias
+        self.dataset['categories'] = self.criterias
         self.dataset['licenses'] = list()
         infoDict = dict()
         infoDict['description'] = 'Kitti Dataset'
