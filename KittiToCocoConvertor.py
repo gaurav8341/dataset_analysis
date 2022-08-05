@@ -33,7 +33,7 @@ class KittiToCocoConvertor:
                 # self.imageDict[fileName[0:-4]] = list()
                 imageDict = dict()
                 imageDict['id'] = len(self.images)
-                imageDict['file_name'] = fileName
+                imageDict['file_name'] = fileName[0:-4] + '.png'
                 imageDict['width'] = ''
                 imageDict['height'] = ''
                 imageDict['coco_url'] = ''

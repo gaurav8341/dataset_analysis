@@ -1,4 +1,3 @@
-import fileinput
 import pycocotools.coco as coco
 import os
 import sys
